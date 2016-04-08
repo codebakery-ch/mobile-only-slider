@@ -2,8 +2,10 @@ directive('miniSlider', ['$window', function ($window) {
     return {
         restrict: 'AE',
         scope: {
+            rel: '@', // current Active Slide for reference
             startAt: '@', // init breakpoint
-            childElm: '@' // init breakpoint
+            wrapperElm: '@', // wrapper for child Elms
+            childElm: '@' // child Elms
         },
         link: function (scope, element, attrs) {
             var doToggle = function () {
@@ -13,7 +15,8 @@ directive('miniSlider', ['$window', function ($window) {
                 $(element).toggleClass('mini-slider', check);
 
                 if(!check){
-                    $(element).attr('style', '');
+                    scope.rel = 0;
+                    $(scope.wrapperElm).attr('style', '');
                 }
 
                 var elementHeights = $(scope.childElm).map(function () {
@@ -26,35 +29,30 @@ directive('miniSlider', ['$window', function ($window) {
 
                 var maxHeight = Math.max.apply(null, elementHeights);
 
-                $(element).css({
+                $(scope.wrapperElm).css({
                         "min-height": check ? maxHeight : '' + 'px',
                         "width": check ? maxWidth : '' + 'px'
                 });
 
-                var currRel = parseInt($(element).attr('rel'));
                 var onePart = maxWidth / 3;
 
-                //  $(scope.childElm).height(check ? maxHeight : '').toggleClass('inslide', check);
-
                 $('.next').on('click', function () {
-                    if(currRel == 2){
+                    if(scope.rel == 2){
                         return;
                     }
-                    currRel++;
-                    $(element).attr('rel', currRel);
-                    $(element).css({
-                        "transform": "translateX(-" + onePart * ( currRel  ) + "px)"
+                    scope.rel++;
+                    $(scope.wrapperElm).css({
+                        "transform": "translateX(-" + onePart * ( scope.rel  ) + "px)"
                     });
                 });
 
                 $('.prev').on('click', function () {
-                    if(currRel == 0){
+                    if(scope.rel == 0){
                         return;
                     }
-                    currRel--;
-                    $(element).attr('rel', currRel);
-                    $(element).css({
-                        "transform": "translateX(-" + onePart * ( currRel  ) + "px)"
+                    scope.rel--;
+                    $(scope.wrapperElm).css({
+                        "transform": "translateX(-" + onePart * ( scope.rel  ) + "px)"
                     });$
                 });
             };
